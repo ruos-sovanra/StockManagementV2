@@ -2,7 +2,10 @@ import Controller.ProductManager;
 import ProductModel.Product;
 import Utils.BackupData;
 import Utils.RestoreData;
+import Utils.Tables;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -11,19 +14,12 @@ public class Main {
         ProductManager productManager = new ProductManager();
         BackupData backupData = new BackupData();
         RestoreData restoreData = new RestoreData();
+        Tables tables = new Tables();
         boolean exit = false;
-
+        List<String> welcomeMenu = new ArrayList<>(List.of("Disp(l)ay","(W)rite","(R)ead","(U)pdate","(D)elete","(S)earch","Set r(o)w","(H)elp","(E)xit"));
 
         while (!exit) {
-            System.out.println("Select an option:");
-            System.out.println("1. Create a product");
-            System.out.println("2. Update a product");
-            System.out.println("3. Delete a product");
-            System.out.println("4. Search for a product");
-            System.out.println("5. Show product");
-            System.out.println("6. Backup products");
-            System.out.println("7. Random product");
-            System.out.println("8. Exit");
+            tables.renderTable(welcomeMenu);
             System.out.print("Enter your choice (1-8): ");
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline left-over

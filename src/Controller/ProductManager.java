@@ -1,6 +1,8 @@
 package Controller;
 
 import ProductModel.Product;
+import Utils.PaginatedList;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.Scanner;
 public class ProductManager {
     private static final String FILE_NAME = "products.dat";
     private static List<Product> products = new ArrayList<>();
-
+    private static long time;
     static {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
@@ -22,6 +24,7 @@ public class ProductManager {
                 products.add(new Product(parts[0], parts[1], Double.parseDouble(parts[2])));
             }
             long end = System.currentTimeMillis();
+            time = (end - start)/1000;
             System.out.println("Time taken to read products: " + (end - start)/1000 + "s");
         } catch (FileNotFoundException ex) {
             // Handle the case where the file does not exist
@@ -85,13 +88,48 @@ public class ProductManager {
         return null;
     }
     public void showProducts() {
-        if (products.isEmpty()) {
-            System.out.println("No products found.");
-            return;
-        }
+        // Assuming 'products' is a List<Product> containing all your products
+        PaginatedList<Product> paginatedProducts = new PaginatedList<>(products,   1); // Show   5 products per page
 
-        for (Product product : products) {
-            System.out.println(product);
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Page " + (((PaginatedList<Product>) paginatedProducts).currentPage +   1) + " of " + paginatedProducts.numberOfPages());
+            List<Product> currentPageProducts = paginatedProducts.getPage(paginatedProducts.currentPage +   1);
+            for (Product product : currentPageProducts) {
+                System.out.println(product); // Print product details
+            }
+            System.out.println("Enter   1 for next page,   2 for previous page,   3 for first page,   4 for last page,   5 to go to a specific page,   6 to exit:");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline left-over
+
+            switch (choice) {
+                case   1: // Next page
+                    paginatedProducts.nextPage();
+                    break;
+                case   2: // Previous page
+                    paginatedProducts.previousPage();
+                    break;
+                case   3: // First page
+                    paginatedProducts.currentPage =   0;
+                    break;
+                case   4: // Last page
+                    paginatedProducts.currentPage = paginatedProducts.numberOfPages() -  1;
+                    break;
+                case   5: // Go to a specific page
+                    System.out.print("Enter the page number: ");
+                    int pageNumber = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline left-over
+                    if (pageNumber >=  1 && pageNumber <= paginatedProducts.numberOfPages()) {
+                        ((PaginatedList<Product>) paginatedProducts).currentPage = pageNumber -  1;
+                    } else {
+                        System.out.println("Invalid page number.");
+                    }
+                    break;
+                case   6: // Exit
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
         }
     }
     private static void writeProductsToFile() {
@@ -104,3 +142,4 @@ public class ProductManager {
         }
     }
 }
+
